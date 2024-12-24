@@ -1,5 +1,7 @@
 import subprocess
 import re
+
+
 result_fping = subprocess.run(["fping", "-a", "-g", "192.168.1.0/24"], capture_output=True, text=True)
 
 address_list = result_fping.stdout.splitlines()
@@ -16,6 +18,8 @@ nmap_reports = [line for line in lines if 'Nmap scan report for' in line]
 mix = [line.split()[4] for line in nmap_reports]
  
 filtered_data = [item for item in mix if not re.match(r'^\d{1,3}(\.\d{1,3}){3}$', item)]
+
+filtered_data = [item.replace('.bbrouter', '') for item in filtered_data]
 
 print()
 
