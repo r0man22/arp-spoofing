@@ -1,32 +1,32 @@
 import socket
 import subprocess
 
-# IP adreslerini tarama
 result_fping = subprocess.run(
     ["fping", "-a", "-g", "192.168.1.0/24"], 
     capture_output=True, 
     text=True
 )
 
-# Tarama sonuçlarını listeye çevirme
 address_list = result_fping.stdout.splitlines()
 
-# Hostname alma fonksiyonu
+if not address_list:
+    print("No IP addresses found by fping.")
+
 def get_device_name(ip_address):
     try:
         hostname, _, _ = socket.gethostbyaddr(ip_address)
-        return hostname
+        return hostname.replace(".bbrouter", "")
     except socket.herror:
         return "Hostname not found"
 
-# Cihazları saklamak için boş bir dictionary
 devices = dict()
 
-# IP adreslerini ve cihaz adlarını ekleme
 for ip in address_list: 
     hostname = get_device_name(ip)
-    devices[ip] = hostname  # Hostname veya hata mesajını ekle
+    devices[ip] = hostname  
 
-# Sonuçları yazdırma
-for ip, name in devices.items():
-    print(f"{ip} - {name}")
+if not devices:
+    print("No devices were resolved.")
+else:
+    for index, (ip, name) in enumerate(devices.items(), start=1):
+        print(f"{index}. {ip} - {name}")
