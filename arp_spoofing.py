@@ -31,5 +31,7 @@ else:
     for index, (ip, name) in enumerate(devices.items(), start=1):
         print(f"{index}. {ip} - {name}")
 
+print("\n")
 
+choice = input("Enter the number of the device you want to arp spoofing -> ")
 
