@@ -1,29 +1,35 @@
+import socket
 import subprocess
-import re
 
-
-result_fping = subprocess.run(["fping", "-a", "-g", "192.168.1.0/24"], capture_output=True, text=True)
+result_fping = subprocess.run(
+    ["fping", "-a", "-g", "192.168.1.0/24"], 
+    capture_output=True, 
+    text=True
+)
 
 address_list = result_fping.stdout.splitlines()
 
-for index, item in enumerate(address_list, start=1):
-	print(f"{index}. {item}")
+if not address_list:
+    print("No IP addresses found by fping.")
 
-result_nmap = subprocess.run(['nmap', '-sn', '192.168.1.0/24'], capture_output=True, text=True)
+def get_device_name(ip_address):
+    try:
+        hostname, _, _ = socket.gethostbyaddr(ip_address)
+        return hostname.replace(".bbrouter", "")
+    except socket.herror:
+        return "Hostname not found"
 
-lines = result_nmap.stdout.split('\n')
+devices = dict()
 
-nmap_reports = [line for line in lines if 'Nmap scan report for' in line]
+for ip in address_list: 
+    hostname = get_device_name(ip)
+    devices[ip] = hostname  
 
-mix = [line.split()[4] for line in nmap_reports]
- 
-filtered_data = [item for item in mix if not re.match(r'^\d{1,3}(\.\d{1,3}){3}$', item)]
+if not devices:
+    print("No devices were resolved.")
+else:
+    for index, (ip, name) in enumerate(devices.items(), start=1):
+        print(f"{index}. {ip} - {name}")
 
-filtered_data = [item.replace('.bbrouter', '') for item in filtered_data]
-
-print()
-
-for index, item in enumerate(filtered_data, start=1):
-	print(f"{index}. {item}")
 
 
